@@ -137,7 +137,6 @@ export default defineComponent({
       html2canvas(unref(imageWrapper)).then((canvas) => {
         let dataURL = canvas.toDataURL("image/jpg");
         imgUrl.value = dataURL;
-        console.log(imgUrl.value);
       });
     };
 

@@ -1,14 +1,35 @@
 'use strict'
 
-import { app, protocol, BrowserWindow } from 'electron'
-import { createProtocol } from 'vue-cli-plugin-electron-builder/lib'
-import installExtension, { VUEJS3_DEVTOOLS } from 'electron-devtools-installer'
+import {
+  app,
+  protocol,
+  BrowserWindow,
+  Tray,
+  nativeImage,
+  Menu
+} from 'electron'
+import {
+  createProtocol
+} from 'vue-cli-plugin-electron-builder/lib'
+import installExtension, {
+  VUEJS3_DEVTOOLS
+} from 'electron-devtools-installer'
+
+const path = require('path')
+
 const isDevelopment = process.env.NODE_ENV !== 'production'
 
+let tray = null
+
+
 // Scheme must be registered before the app is ready
-protocol.registerSchemesAsPrivileged([
-  { scheme: 'app', privileges: { secure: true, standard: true } }
-])
+protocol.registerSchemesAsPrivileged([{
+  scheme: 'app',
+  privileges: {
+    secure: true,
+    standard: true
+  }
+}])
 
 async function createWindow() {
   // Create the browser window.
@@ -16,13 +37,42 @@ async function createWindow() {
     width: 1000,
     height: 700,
     webPreferences: {
-      
+
       // Use pluginOptions.nodeIntegration, leave this alone
       // See nklayman.github.io/vue-cli-plugin-electron-builder/guide/security.html#node-integration for more info
       nodeIntegration: process.env.ELECTRON_NODE_INTEGRATION,
       contextIsolation: !process.env.ELECTRON_NODE_INTEGRATION
     }
   })
+
+  // 托盘
+  // 创建一个icon
+  const icon = nativeImage.createFromPath(path.join(__dirname, '/static/code-creator-128.icns'))
+  // const icon = nativeImage.createFromPath('./static/code-creator-128.icns')
+
+  // 实例化一个托盘对象
+  tray = new Tray(icon)
+  tray.setToolTip('Code-creator')
+  tray.setTitle('Code-creator')
+  // 托盘鼠标右键
+  tray.on('right-click', () => {
+    //创建右键菜单
+    const menuConfig = Menu.buildFromTemplate([{
+      label: 'Exit',
+      click: () => app.quit(),
+    }])
+    tray.popUpContextMenu(menuConfig)
+  })
+  tray.on('click', () => {
+    // 这里来控制窗口的显示和隐藏
+    if (win.isVisible()) {
+      win.hide()
+    } else {
+      win.show()
+    }
+  })
+
+
 
   if (process.env.WEBPACK_DEV_SERVER_URL) {
     // Load the url of the dev server if in development mode
@@ -64,6 +114,9 @@ app.on('ready', async () => {
   }
   createWindow()
 })
+
+
+
 
 // Exit cleanly on request from parent process in development mode.
 if (isDevelopment) {

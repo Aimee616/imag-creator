@@ -1,7 +1,13 @@
+const CopyPlugin = require("copy-webpack-plugin");
+const path = require('path')
+console.log(path.join(__dirname, '/static/'), '324')
 module.exports = {
+  assetsDir: 'src/static',
+  publicPath: '/',
   transpileDependencies: [
     'vuetify'
   ],
+
   pluginOptions: {
     cssName: "'default",
     // 配置全局less变量
@@ -24,5 +30,13 @@ module.exports = {
         },
       },
     },
+  },
+  configureWebpack: {
+    // plugins: [
+    //   new CopyPlugin([{
+    //     from: path.join(__dirname, '/static/code-creator.png'),
+    //     to: path.join(__dirname, '/dist_electron/static/')
+    //   }], ),
+    // ],
   }
 }
